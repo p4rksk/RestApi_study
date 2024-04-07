@@ -3,6 +3,7 @@ package shop.mtcoding.blog.reply;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import shop.mtcoding.blog.board.Board;
+import shop.mtcoding.blog.user.SessionUser;
 import shop.mtcoding.blog.user.User;
 
 public class ReplyRequest {
@@ -14,12 +15,16 @@ public class ReplyRequest {
         @NotEmpty
         private String comment;
 
-        public Reply toEntity(User sessionUser, Board board){
+        public Reply toEntity(SessionUser sessionUser, Board board){
+            User user = new User();
+            user.setId(sessionUser.getId());
+
             return Reply.builder()
                     .comment(comment)
                     .board(board)
-                    .user(sessionUser)
+                    .user(user)
                     .build();
         }
+
     }
 }
