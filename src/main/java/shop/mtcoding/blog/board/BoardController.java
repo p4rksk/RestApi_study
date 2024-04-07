@@ -3,8 +3,10 @@ package shop.mtcoding.blog.board;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import shop.mtcoding.blog._core.utils.ApiUtil;
 import shop.mtcoding.blog.user.User;
 
 import java.util.List;
@@ -18,49 +20,44 @@ public class BoardController {
 
 
     @GetMapping("/")
-    public String index(HttpServletRequest request) {
-        List<Board> boardList = boardService.글목록조회();
-        request.setAttribute("boardList", boardList);
-        return "index";
+    public ResponseEntity<?> main(){
+        List<BoardResponse.MainDTO> boardList = boardService.글목록조회();
+        return ResponseEntity.ok(new ApiUtil(boardList));
     }
 
-    @PostMapping("/api/boards")
-    public String save(BoardRequest.SaveDTO reqDTO) {
+    @GetMapping("/boards/{id}/detail")
+    public ResponseEntity<?> detail(@PathVariable Integer id){
         User sessionUser = (User) session.getAttribute("sessionUser");
-        boardService.글쓰기(reqDTO, sessionUser);
-        return "redirect:/";
-    }
-
-    @PutMapping("/api/boards/{id}")
-    public String update(@PathVariable Integer id, BoardRequest.UpdateDTO reqDTO) {
-        User sessionUser = (User) session.getAttribute("sessionUser");
-        boardService.글수정(id, sessionUser.getId(), reqDTO);
-        return "redirect:/board/" + id;
+        BoardResponse.DetailDTO respDTO = boardService.글상세보기(id, sessionUser);
+        return ResponseEntity.ok(new ApiUtil(respDTO));
     }
 
     @GetMapping("/api/boards/{id}")
-    public String updateForm(@PathVariable Integer id, HttpServletRequest request) {
-        Board board = boardService.글조회(id);
-        request.setAttribute("board", board);
-        return "board/update-form";
+    public ResponseEntity<?> findOne(@PathVariable Integer id){
+        BoardResponse.DTO respDTO = boardService.글조회(id);
+        return ResponseEntity.ok(new ApiUtil(respDTO));
+    }
+
+    @PostMapping("/api/boards")
+    public ResponseEntity<?> save(@RequestBody BoardRequest.SaveDTO reqDTO) {
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        Board board = boardService.글쓰기(reqDTO, sessionUser);
+        return ResponseEntity.ok(new ApiUtil(board));
+    }
+
+    @PutMapping("/api/boards/{id}")
+    public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody BoardRequest.UpdateDTO reqDTO) {
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        BoardResponse.DTO respDTO = boardService.글수정(id, sessionUser.getId(), reqDTO);
+        return ResponseEntity.ok(new ApiUtil(respDTO));
     }
 
     @DeleteMapping("/api/boards/{id}")
-    public String delete(@PathVariable Integer id) {
+    public ResponseEntity<?> delete(@PathVariable Integer id) {
         User sessionUser = (User) session.getAttribute("sessionUser");
         boardService.글삭제(id, sessionUser.getId());
-        return "redirect:/";
+        return ResponseEntity.ok(new ApiUtil(null));
     }
 
-
-    @GetMapping("/api/boards/{id}/detail")
-    public String detail(@PathVariable Integer id, HttpServletRequest request) {
-        User sessionUser = (User) session.getAttribute("sessionUser");
-        Board board = boardService.글상세보기(id, sessionUser);
-
-        request.setAttribute("board", board);
-        System.out.println("서버 사이드 렌더링 직전에는 Board와 User만 조회된 상태이다~~~~~~~~~~~~~~");
-        return "board/detail";
-    }
 
 }

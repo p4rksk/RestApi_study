@@ -16,19 +16,20 @@ public class UserService {
     private final UserJPARepository userJPARepository;
 
     @Transactional
-    public User 회원수정(int id, UserRequest.UpdateDTO reqDTO){
+    public UserResponse.DTO 회원수정(int id, UserRequest.UpdateDTO reqDTO){
         User user = userJPARepository.findById(id)
                 .orElseThrow(() -> new Exception404("회원정보를 찾을 수 없습니다"));
 
         user.setPassword(reqDTO.getPassword());
         user.setEmail(reqDTO.getEmail());
-        return user;
+        return new UserResponse.DTO(user);
+
     } // 더티체킹
 
-    public User 회원조회(int id){
+    public UserResponse.DTO 회원조회(int id){
         User user = userJPARepository.findById(id)
                 .orElseThrow(() -> new Exception404("회원정보를 찾을 수 없습니다"));
-        return user;
+        return new UserResponse.DTO(user);
     }
     
     public User 로그인(UserRequest.LoginDTO reqDTO){
@@ -47,7 +48,6 @@ public class UserService {
         }
 
         // 2. 회원가입
-        userJPARepository.save(reqDTO.toEntity());
-        return null;
+        return  userJPARepository.save(reqDTO.toEntity());
     }
 }
