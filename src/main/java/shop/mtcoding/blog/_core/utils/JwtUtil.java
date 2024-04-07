@@ -3,9 +3,6 @@ package shop.mtcoding.blog._core.utils;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import lombok.RequiredArgsConstructor;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
 import shop.mtcoding.blog.user.SessionUser;
 import shop.mtcoding.blog.user.User;
 
@@ -26,10 +23,10 @@ public class JwtUtil {
         DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC512("metacoding")).build().verify(jwt);
         int id = decodedJWT.getClaim("id").asInt();
         String username = decodedJWT.getClaim("username").asString();
-//
-//        return SessionUser.builder()
-//                .id(id)
-//                .username(username)
-//                .build();
+
+        return SessionUser.builder()
+                .id(id)
+                .username(username)
+                .build();
     }
 }

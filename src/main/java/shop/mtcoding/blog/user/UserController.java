@@ -29,10 +29,11 @@ public class UserController {
 
     @PutMapping("/api/users/{id}")
     public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody UserRequest.UpdateDTO reqDTO) {
-        User sessionUser = (User) session.getAttribute("sessionUser");
-        UserResponse.DTO respDTO= userService.회원수정(sessionUser.getId(), reqDTO);
-        session.setAttribute("sessionUser", respDTO);
-        return ResponseEntity.ok(new ApiUtil(respDTO));
+        SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
+        SessionUser newSessionUser = userService.회원수정(sessionUser.getId(), reqDTO);
+        session.setAttribute("sessionUser", newSessionUser);
+
+        return ResponseEntity.ok(new ApiUtil(newSessionUser));
     }
 
     @PostMapping("/join")
@@ -43,10 +44,10 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserRequest.LoginDTO reqDTO) {
-        User sessionUser = userService.로그인(reqDTO);
-        session.setAttribute("sessionUser", sessionUser);
-        return ResponseEntity.ok(new ApiUtil(null));
+        String jwt = userService.로그인(reqDTO);
+        return ResponseEntity.ok().header("Authorization", "Bearer "+jwt).body(new ApiUtil(null));
     }
+
 
     @GetMapping("/logout")
     public ResponseEntity<?> logout() {
