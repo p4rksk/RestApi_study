@@ -15,9 +15,7 @@ public class ReplyRequest {
         @NotEmpty
         private String comment;
 
-        public Reply toEntity(SessionUser sessionUser, Board board){
-            User user = new User();
-            user.setId(sessionUser.getId());
+        public Reply toEntity(User user, Board board){
 
             return Reply.builder()
                     .comment(comment)
